@@ -1,0 +1,44 @@
+name: Render Animation
+
+on:
+  workflow_dispatch:   # ম্যানুয়ালি চালানোর বাটন
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libcairo2-dev libpango1.0-dev pkg-config
+
+      - name: Install Manim
+        run: pip install manim
+
+      - name: Write scene
+        run: |
+          cat > scene.py << 'EOF'
+          from manim import *
+
+          class Hello(Scene):
+              def construct(self):
+                  circle = Circle(color=BLUE, fill_opacity=0.6)
+                  title = Text("আমার প্রথম অ্যানিমেশন")
+                  self.play(Create(circle))
+                  self.play(circle.animate.shift(RIGHT * 2).scale(0.5))
+                  self.play(Write(title.to_edge(UP)))
+                  self.wait(1)
+          EOF
+
+      - name: Render
+        run: manim -qm scene.py Hello
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: animation-video
+          path: media/videos/**/*.mp4
