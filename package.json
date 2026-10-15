@@ -1,0 +1,6 @@
+{
+  "name": "antik-code-studio",
+  "dependencies": {
+    "canvas": "^2.11.2"
+  }
+}
